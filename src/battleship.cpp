@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include "battleship.hpp"
 
-//instruction to the game
+//instruction of the game
 void help() {
     std::cout << "\nInstruction to the Game: " << std::endl;
     std::cout << "- The program generate board and ships, the user hits it. " << std::endl;    
@@ -20,7 +20,7 @@ void help() {
     std::cout << "- If you want to show generation board input 's'. " << std::endl;
     std::cout << "Let's play. " << std::endl << std::endl;
 }
-//preface teks befor game
+//preface text before game
 void game_preface() {
     std::cout << "\n-------------------------------------------------------" << std::endl;
     std::cout << "|                  Battleship Game                    |" << std::endl;
@@ -29,7 +29,7 @@ void game_preface() {
     help();
 }
 //print board
-void is_print_board(char a[10][10]) {
+void print_board(char a[10][10]) {
 
     for (int i = 0; i < 10; ++i) {
         if (0 == i) std::cout << "  ";
@@ -44,8 +44,8 @@ void is_print_board(char a[10][10]) {
         std::cout << std::endl;
     }
 }
-//function checks array is empty or not
-bool check_empty_array(char gen_board[10][10], int row, int row_up, int col, int row_down,const int& ship,const int& is_row_col) {
+//function checks area is empty or not
+bool check_empty_area(char gen_board[10][10], int row, int row_up, int col, int row_down,const int& ship,const int& is_row_col) {
     bool b = true;
     for (int i = row - row_up; i <= row + row_down; ++i) { 
         for (int j = col - 1; j < col + ship + 1; ++j) {
@@ -60,8 +60,8 @@ bool check_empty_array(char gen_board[10][10], int row, int row_up, int col, int
     }
     return b;
 }   
-//calls empty array function in the appropriate direction 
-bool is_call_empty_array(char gen_board[10][10], int row, int col, const int& ship, const int& is_row_col) {
+//check if area is empty or not for the appropriate direction depends on check_empty_area function's return value
+bool is_empty_area(char gen_board[10][10], int row, int col, const int& ship, const int& is_row_col) {
     bool b = true;
     if (2 == is_row_col) {
         int t = col;
@@ -69,16 +69,16 @@ bool is_call_empty_array(char gen_board[10][10], int row, int col, const int& sh
         row = t;
     }
     if (0 == row) {
-       b = check_empty_array (gen_board, row, 0, col, 1, ship, is_row_col); 
+       b = check_empty_area (gen_board, row, 0, col, 1, ship, is_row_col); 
     } else if (9 == row) {
-       b = check_empty_array (gen_board, row, 1, col, 0, ship, is_row_col);
+       b = check_empty_area (gen_board, row, 1, col, 0, ship, is_row_col);
     } else {
-       b = check_empty_array (gen_board, row, 1, col, 1, ship, is_row_col);
+       b = check_empty_area (gen_board, row, 1, col, 1, ship, is_row_col);
     }
     return b;
 }
-//generates ships random
-void is_gen_ship(char gen_board[10][10]) {
+//generates ships randomly
+void gen_ship(char gen_board[10][10]) {
     srand(time(NULL));
     int ship_length = 4;
     int ship_count = 1;
@@ -88,7 +88,7 @@ void is_gen_ship(char gen_board[10][10]) {
             int col = rand() % 10;
             int is_row_col = rand() % 2 + 1;
             if (1 == is_row_col) {
-                while ((10 - col) < ship_length || is_call_empty_array(gen_board,row,col,ship_length,is_row_col) != true) {
+                while ((10 - col) < ship_length || is_empty_area(gen_board, row, col, ship_length, is_row_col) != true) {
                     row = rand() % 10;
                     col = rand() % 10;
                 }
@@ -96,7 +96,7 @@ void is_gen_ship(char gen_board[10][10]) {
                     gen_board[row][l] = 'X';
                 }
             } else if (2 == is_row_col){
-                while ((10 - row) < ship_length || is_call_empty_array(gen_board,row,col,ship_length,is_row_col) != true) {
+                while ((10 - row) < ship_length || is_empty_area(gen_board, row, col, ship_length, is_row_col) != true) {
                     row = rand() % 10;
                     col = rand() % 10;
                 }
@@ -109,8 +109,8 @@ void is_gen_ship(char gen_board[10][10]) {
         --ship_length;
    }
 }
-//gets input, checked and return it
-bool get_checked_input(char gen_board[10][10], int& row, int& col) {
+//get checked input for row and col 
+void get_checked_input(char gen_board[10][10], int& row, int& col) {
     bool b = false;
     std::string str("");
     std::cout << "Input your hit. " << std::endl;
@@ -127,10 +127,9 @@ bool get_checked_input(char gen_board[10][10], int& row, int& col) {
     std::stringstream num2;
     num2 << str[2];                  
     num2 >> col;
-    return b;
 }
 //checks input of one length according to the program rule
-bool one_size(std::string& str, char gen_board[10][10]) {
+bool check_one_size_input(std::string& str, char gen_board[10][10]) {
     bool b = false;   
     while (1 == str.size()) {
         switch (str[0]) 
@@ -142,7 +141,7 @@ bool one_size(std::string& str, char gen_board[10][10]) {
             case 'h': help();
                       b = true;
                       break;
-            case 's': is_print_board(gen_board);
+            case 's': print_board(gen_board);
                       break;
                       b = true;
             default: std::cout << "Incorrect input. " << std::endl;
@@ -163,7 +162,7 @@ bool catch_error(std::string& str, char gen_board [10][10]) {
                 std::cout << "Please input number between 0 to 9 in this form - number.number (e.g. 1.2). " << std::endl;
                 getline(std::cin,str);
         }
-        if (one_size(str,gen_board) == true) {
+        if (check_one_size_input(str,gen_board) == true) {
                 b = true;
         }
         if((str[0] < '0' || str[0] > '9') || (str[1] != '.') || (str[2] < '0' || str[2] > '9')) {
@@ -216,17 +215,17 @@ bool is_sunk(char gen_board[10][10], char player_board[10][10], int row, int col
     }
     return true;  
 }
-//calls check_fill funtion in the appropriate direction
-void is_call_fill_around_sunk_ship(char player_board[10][10], int row, int col, int& dir) {
+//calls fill_around funtion for the appropriate direction
+void call_fill_around_sunk_ship(char player_board[10][10], int row, int col, int& dir) {
     if (0 == dir) {
-        is_check_fill_around_sunk_ship (player_board, row, 1, col, 0);
+        fill_around_sunk_ship (player_board, row, 1, col, 0);
     } else if (1 == dir) {
-        is_check_fill_around_sunk_ship (player_board, row, 0, col, 1);
+        fill_around_sunk_ship (player_board, row, 0, col, 1);
     }
 }
 
 //check around sunk ship and fill around it *
-void is_check_fill_around_sunk_ship(char player_board[10][10], int row, int row_up_down, int col, int col_up_down) { 
+void fill_around_sunk_ship(char player_board[10][10], int row, int row_up_down, int col, int col_up_down) { 
     while ('X' == player_board[row][col]) {
         player_board[row][col] = 'x';
         for (int i = row - 1; i <= row + 1; ++i) {
@@ -264,9 +263,10 @@ void run () {
     int ship_count = 0;
     int dir = -1;
     std::string s("");
-    is_gen_ship(gen_board);
+    gen_ship(gen_board);
     game_preface();
-    while (get_checked_input(gen_board,row,col) == false) {
+    while (ship_count < 20) {
+        get_checked_input(gen_board,row,col);
         switch (gen_board[row][col])
         {
             case '-': if (player_board[row][col] == '*') {
@@ -284,21 +284,15 @@ void run () {
                       ++ship_count;
                       if (is_sunk (gen_board, player_board, row, col, dir)  == true) {
                           std::cout << "The ship is sunk" << std::endl;
-                          is_call_fill_around_sunk_ship(player_board, row, col, dir);
+                          call_fill_around_sunk_ship(player_board, row, col, dir);
                       } else {
                           std::cout << "The ship is injured\n";
                       }
                       break;
         }
-        is_print_board(player_board);
+        print_board(player_board);
         if (ship_count == 20) {
             std::cout << "You win!!! "<<std::endl;
-            break;
         }
     }
 }
-
-/*int main() {
-    run();
-    return 0;
-}*/
