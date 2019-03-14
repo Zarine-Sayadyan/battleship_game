@@ -15,4 +15,4 @@ bool check_empty_area(char [10][10], int, int, int, int, const int&,const int&);
 bool is_empty_area(char [10][10], int, int, const int&, const int&);
 void call_fill_around_sunk_ship(char [10][10], int, int, int&);
 void fill_around_sunk_ship(char [10][10], int, int, int, int);
-
+void row_col(char [10][10], int&, int&, const int&, const int&, const int&);
