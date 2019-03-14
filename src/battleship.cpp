@@ -82,7 +82,7 @@ bool is_empty_area(char gen_board[10][10], int row, int col, const int& ship, co
     return b;
 }
 //find row, col where can gnerate ship
-void row_col(char gen_board[10][10], int& row, int& col, const int& ship_length, const int& is_row_col, const int& row_or_col) 
+void find_row_col(char gen_board[10][10], int& row, int& col, const int& ship_length, const int& is_row_col, const int& row_or_col) 
 {
     while ((10 - col) < ship_length || is_empty_area(gen_board, row, col, ship_length, is_row_col) != true) {
         row = rand() % 10;
@@ -101,12 +101,12 @@ void gen_ship(char gen_board[10][10])
             int col = rand() % 10;
             int is_row_col = rand() % 2 + 1;
             if (1 == is_row_col) { //for generating in row
-                row_col(gen_board, row, col, ship_length, is_row_col, col);
+                find_row_col(gen_board, row, col, ship_length, is_row_col, col);
                 for (int l = col; l < col + ship_length; ++l) {
                     gen_board[row][l] = 'X';
                 }
             } else if (2 == is_row_col) { //for generating in col
-                row_col(gen_board, row, col, ship_length, is_row_col, row);
+                find_row_col(gen_board, row, col, ship_length, is_row_col, row);
                 for (int l = row; l < row + ship_length; ++l) {
                     gen_board[l][col] = 'X';
                 }
